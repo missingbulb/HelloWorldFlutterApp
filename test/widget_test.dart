@@ -12,7 +12,7 @@ Future<void> loadFonts() async {
 }
 
 void main() {
-  testWidgets('App renders hello world with orange background and hi button',
+  testWidgets('App renders hello world with red background and hi button',
       (WidgetTester tester) async {
     await loadFonts();
     await tester.pumpWidget(const MyApp());
@@ -21,6 +21,6 @@ void main() {
     expect(find.text('hi!'), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-    expect(scaffold.backgroundColor, Colors.orange);
+    expect(scaffold.backgroundColor, Colors.red);
   });
 }
