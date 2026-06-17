@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
         useMaterial3: true,
+        fontFamily: 'Roboto',
       ),
       home: const HomePage(),
     );
@@ -52,6 +53,7 @@ class HomePage extends StatelessWidget {
                 textStyle: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'Roboto',
                 ),
               ),
               child: const Text('hi!'),
