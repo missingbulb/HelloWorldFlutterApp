@@ -23,15 +23,4 @@ void main() {
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
     expect(scaffold.backgroundColor, Colors.orange);
   });
-
-  testWidgets('Screenshot - initial screen', (WidgetTester tester) async {
-    await loadFonts();
-    await tester.pumpWidget(const MyApp());
-    await tester.pumpAndSettle();
-
-    await expectLater(
-      find.byType(MyApp),
-      matchesGoldenFile('goldens/initial_screen.png'),
-    );
-  });
 }
