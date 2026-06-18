@@ -1,0 +1,31 @@
+name: Build Release Version
+
+# Builds an installable Android APK in the cloud — runs ONLY when you trigger it
+# manually (Actions tab -> "Build Release Version" -> "Run workflow").
+# When it finishes, download the APK from the run's "Artifacts" section, then:
+#   - drop it into Appetize.io to run in a browser-based emulator, or
+#   - sideload it onto a real Android device.
+on:
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      # Gate the release build on the tests passing.
+      - run: flutter test
+      # This repo ships only lib/ + test/ (it's a render-only project), so the
+      # android/ platform folder doesn't exist. Generate it on the runner.
+      # `flutter create` adds missing platform files without touching lib/main.dart.
+      - run: flutter create --platforms=android .
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error

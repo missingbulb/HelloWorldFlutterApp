@@ -1,9 +1,7 @@
-name: build-android
+name: tests
 
-# Builds an installable Android APK in the cloud — no local Flutter/Android SDK needed.
-# Download the APK from the run's "Artifacts" section, then either:
-#   - drop it into Appetize.io to run in a browser-based emulator, or
-#   - sideload it onto a real Android device.
+# Per-commit signal: compiles the Dart and runs the widget test on every push.
+# Does NOT build an APK — that lives in the manual "Build Release Version" workflow.
 on:
   push:
     branches: ['**']
@@ -18,27 +16,7 @@ jobs:
         with:
           channel: stable
       - run: flutter pub get
-      # Runs the widget test. The ~600s teardown stall documented in CLAUDE.md is
-      # specific to this repo's sandbox (dropped outbound sockets); GitHub runners
-      # have normal networking, so `flutter test` completes cleanly here.
+      # The ~600s teardown stall documented in CLAUDE.md is specific to this repo's
+      # sandbox (dropped outbound sockets); GitHub runners have normal networking,
+      # so `flutter test` completes cleanly here.
       - run: flutter test
-
-  apk:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-      - run: flutter pub get
-      # This repo ships only lib/ + test/ (it's a render-only project), so the
-      # android/ platform folder doesn't exist. Generate it on the runner.
-      # `flutter create` adds missing platform files without touching lib/main.dart.
-      - run: flutter create --platforms=android .
-      - run: flutter build apk --debug
-      - uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
-          if-no-files-found: error
