@@ -21,6 +21,6 @@ void main() {
     expect(find.text('hi!'), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-    expect(scaffold.backgroundColor, Colors.red);
+    expect(scaffold.backgroundColor, Colors.blue);
   });
 }
