@@ -1,10 +1,10 @@
-name: Build Release Version
+name: Build Debug Artifacts
 
-# Builds an installable Android APK in the cloud — runs ONLY when you trigger it
-# manually (Actions tab -> "Build Release Version" -> "Run workflow").
+# Builds an installable debug Android APK in the cloud — runs ONLY when you trigger
+# it manually (Actions tab -> "Build Debug Artifacts" -> "Run workflow").
 # When it finishes, download the APK from the run's "Artifacts" section, then:
 #   - drop it into Appetize.io to run in a browser-based emulator, or
-#   - sideload it onto a real Android device.
+#   - sideload it onto a real Android device (no signing needed for debug builds).
 on:
   workflow_dispatch:
 
@@ -17,15 +17,15 @@ jobs:
         with:
           channel: stable
       - run: flutter pub get
-      # Gate the release build on the tests passing.
+      # Gate the build on the tests passing.
       - run: flutter test
       # This repo ships only lib/ + test/ (it's a render-only project), so the
       # android/ platform folder doesn't exist. Generate it on the runner.
       # `flutter create` adds missing platform files without touching lib/main.dart.
       - run: flutter create --platforms=android .
-      - run: flutter build apk --release
+      - run: flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
-          name: app-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: app-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
           if-no-files-found: error
