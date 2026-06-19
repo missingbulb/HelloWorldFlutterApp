@@ -172,8 +172,8 @@ And the assertions in `test/widget_test.dart`:
 
 ## LGTM → verify, merge, then process retrospective
 
-When the user says **"LGTM"** (a UserPromptSubmit hook,
-`.claude/hooks/lgtm-retrospective.sh`, reminds Claude):
+When the user says **"LGTM"** as approval (judge from context — a mention of the
+word while *discussing* this workflow is not an approval):
 
 1. **Update the feature branch from `main`** (pull/merge `origin main` into it) so
    it is verified against the code it will become.
