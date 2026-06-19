@@ -170,14 +170,20 @@ And the assertions in `test/widget_test.dart`:
   Flutter version differs from CI and resolves slightly different versions; revert
   the lockfile so the feature diff stays clean.
 
-## LGTM → merge, then process retrospective
+## LGTM → verify, merge, then process retrospective
 
 When the user says **"LGTM"** (a UserPromptSubmit hook,
-`.claude/hooks/lgtm-retrospective.sh`, reminds Claude), **first merge the current
-feature branch into `main`** (fast-forward local `main`, then push `origin main`)
-and confirm the push succeeded. **Only after the merge is pushed**, run a short,
-ranked, **measured** retrospective of the work just completed — the questions the
-user keeps asking about slow processes:
+`.claude/hooks/lgtm-retrospective.sh`, reminds Claude):
+
+1. **Update the feature branch from `main`** (pull/merge `origin main` into it) so
+   it is verified against the code it will become.
+2. **Run the full build** (`python3 build.py`) and confirm **all tests are green**
+   on the updated branch. If anything fails, **stop and report — do not merge.**
+3. **Only after tests pass**, merge the feature branch into `main` (fast-forward
+   local `main`, then push `origin main`) and confirm the push succeeded.
+4. **Only after the merge is pushed**, run a short, ranked, **measured**
+   retrospective of the work just completed — the questions the user keeps asking
+   about slow processes:
 
 1. **How many processes ran**, and could it be fewer (ideally one)?
 2. **What took longest** — give wall-clock numbers, separating Dart compile vs
