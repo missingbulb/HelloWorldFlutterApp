@@ -1,8 +1,9 @@
 # HelloWorldFlutterApp
 
 A Flutter app with a colored background, "hello world" text, and a "change color"
-button that toggles the background between blue and red. Once pressed, the label
-names the current colour ("hello world red" / "hello world blue").
+button that cycles the background through blue → red → purple → blue. Once pressed,
+the label names the current colour ("hello world red" / "hello world purple" /
+"hello world blue").
 Screenshot generation is driven by Flutter's rendering engine — no hand-drawing.
 
 ## Building & generating screenshots
@@ -25,7 +26,8 @@ Both write every golden in one run:
 | `test/goldens/initial_screen.png` | blue (initial; legacy name) |
 | `test/goldens/state_initial.png` | blue (before any press) |
 | `test/goldens/state_after_press_1.png` | red (after one press) |
-| `test/goldens/state_after_press_2.png` | blue (after two presses) |
+| `test/goldens/state_after_press_2.png` | purple (after two presses) |
+| `test/goldens/state_after_press_3.png` | blue (after three presses) |
 
 Both scripts share `flutter_test_runner.py`, which encodes the process rules below.
 
@@ -144,9 +146,11 @@ passed directly to a widget, or any `styleFrom` helper, always set
 
 Places in `lib/main.dart` that must stay in sync:
 - `ColorScheme.fromSeed(seedColor: Colors.X)`
-- the initial `_backgroundColor` and the toggle in `_toggleColor()`
+- the `_cycle` list (the ordered colours) and `_colorNames` (colour → label name)
+- the initial `_backgroundColor` (must be the first entry in `_cycle`)
 - the button's `foregroundColor` (it follows `_backgroundColor`)
-- `_toggleColor()` also sets `_label` to `'hello world <colour>'` after a press
+- `_toggleColor()` advances `_backgroundColor` through `_cycle` and sets `_label`
+  to `'hello world <colour>'` after a press
 
 And the assertions in `test/widget_test.dart`:
 - `expect(scaffold.backgroundColor, Colors.X)`

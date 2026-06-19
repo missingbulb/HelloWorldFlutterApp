@@ -52,7 +52,7 @@ void main() {
     );
   });
 
-  testWidgets('App returns to blue after the change color button is pressed twice',
+  testWidgets('App turns purple after the change color button is pressed twice',
       (WidgetTester tester) async {
     await loadFonts();
     await tester.pumpWidget(const MyApp());
@@ -67,7 +67,47 @@ void main() {
     scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
     expect(scaffold.backgroundColor, Colors.red);
 
-    // Press again -> back to blue.
+    // Press again -> purple.
+    await tester.tap(find.text('change color'));
+    await tester.pumpAndSettle();
+
+    // The screen should now be purple and the label should name the new colour.
+    expect(find.text('hello world purple'), findsOneWidget);
+    expect(find.text('change color'), findsOneWidget);
+
+    scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.purple);
+
+    // The button foreground colour follows the background colour.
+    final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+    expect(
+      button.style?.foregroundColor?.resolve(<MaterialState>{}),
+      Colors.purple,
+    );
+  });
+
+  testWidgets('App returns to blue after the change color button is pressed three times',
+      (WidgetTester tester) async {
+    await loadFonts();
+    await tester.pumpWidget(const MyApp());
+
+    // Sanity check: starts blue.
+    Scaffold scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.blue);
+
+    // Press once -> red.
+    await tester.tap(find.text('change color'));
+    await tester.pumpAndSettle();
+    scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.red);
+
+    // Press again -> purple.
+    await tester.tap(find.text('change color'));
+    await tester.pumpAndSettle();
+    scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.purple);
+
+    // Press a third time -> back to blue.
     await tester.tap(find.text('change color'));
     await tester.pumpAndSettle();
 

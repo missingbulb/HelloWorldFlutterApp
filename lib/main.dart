@@ -29,19 +29,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // The screen starts blue. Pressing the button toggles blue <-> red and, once
-  // pressed, the label names the new colour ("hello world red" / "hello world
-  // blue") so each state is distinguishable.
-  Color _backgroundColor = Colors.blue;
+  // The screen starts blue. Pressing the button cycles blue -> red -> purple ->
+  // blue and, once pressed, the label names the new colour ("hello world red" /
+  // "hello world purple" / "hello world blue") so each state is distinguishable.
+  // Ordered colour cycle and matching label names (kept in lockstep by index).
+  static const List<Color> _cycle = <Color>[
+    Colors.blue,
+    Colors.red,
+    Colors.purple,
+  ];
+  static const List<String> _colorNames = <String>['blue', 'red', 'purple'];
+
+  int _colorIndex = 0;
+  Color get _backgroundColor => _cycle[_colorIndex];
   String _label = 'hello world';
 
   void _toggleColor() {
     setState(() {
-      _backgroundColor =
-          _backgroundColor == Colors.blue ? Colors.red : Colors.blue;
-      final String colorName =
-          _backgroundColor == Colors.blue ? 'blue' : 'red';
-      _label = 'hello world $colorName';
+      _colorIndex = (_colorIndex + 1) % _cycle.length;
+      _label = 'hello world ${_colorNames[_colorIndex]}';
     });
   }
 

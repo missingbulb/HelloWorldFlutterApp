@@ -3,10 +3,11 @@
 // state to test/goldens/. A SINGLE `flutter test` run produces ALL images:
 // pump the app, capture, tap, capture, tap, capture.
 //
-//   initial_screen.png        blue  (legacy name for the initial screen)
-//   state_initial.png         blue  (before any press)
-//   state_after_press_1.png   red   (after one press)
-//   state_after_press_2.png   blue  (after two presses)
+//   initial_screen.png        blue    (legacy name for the initial screen)
+//   state_initial.png         blue    (before any press)
+//   state_after_press_1.png   red     (after one press)
+//   state_after_press_2.png   purple  (after two presses)
+//   state_after_press_3.png   blue    (after three presses)
 //
 // Design rules this file upholds (see CLAUDE.md):
 //   * Fewest processes  — every image comes from this one test run.
@@ -32,6 +33,7 @@ const List<String> _expectedImages = <String>[
   'state_initial',
   'state_after_press_1',
   'state_after_press_2',
+  'state_after_press_3',
 ];
 
 Future<void> _loadFonts() async {
@@ -93,7 +95,10 @@ void main() {
     _writePng('state_after_press_1', await _rasterize(tester)); // red
 
     await _press(tester);
-    _writePng('state_after_press_2', await _rasterize(tester)); // blue
+    _writePng('state_after_press_2', await _rasterize(tester)); // purple
+
+    await _press(tester);
+    _writePng('state_after_press_3', await _rasterize(tester)); // blue
 
     // Synchronous-completion guard: the run is not "done" until every expected
     // image is on disk and non-empty. Throwing here fails the test, so the DONE
