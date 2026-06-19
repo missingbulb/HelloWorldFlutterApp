@@ -12,15 +12,43 @@ Future<void> loadFonts() async {
 }
 
 void main() {
-  testWidgets('App renders hello world with red background and hi button',
+  testWidgets('App renders hello world with blue background and change color button',
       (WidgetTester tester) async {
     await loadFonts();
     await tester.pumpWidget(const MyApp());
 
     expect(find.text('hello world'), findsOneWidget);
-    expect(find.text('hi!'), findsOneWidget);
+    expect(find.text('change color'), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
     expect(scaffold.backgroundColor, Colors.blue);
+  });
+
+  testWidgets('App turns red after the change color button is pressed once',
+      (WidgetTester tester) async {
+    await loadFonts();
+    await tester.pumpWidget(const MyApp());
+
+    // Sanity check: starts blue.
+    Scaffold scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.blue);
+
+    // Press the button once.
+    await tester.tap(find.text('change color'));
+    await tester.pumpAndSettle();
+
+    // The screen should now be red, with the text and button unchanged.
+    expect(find.text('hello world'), findsOneWidget);
+    expect(find.text('change color'), findsOneWidget);
+
+    scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.red);
+
+    // The button foreground colour follows the background colour.
+    final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+    expect(
+      button.style?.foregroundColor?.resolve(<MaterialState>{}),
+      Colors.red,
+    );
   });
 }

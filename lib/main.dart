@@ -21,13 +21,28 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // The screen starts blue. Pressing the button toggles blue <-> red.
+  Color _backgroundColor = Colors.blue;
+
+  void _toggleColor() {
+    setState(() {
+      _backgroundColor =
+          _backgroundColor == Colors.blue ? Colors.red : Colors.blue;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      backgroundColor: _backgroundColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -42,10 +57,10 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: _toggleColor,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.blue,
+                foregroundColor: _backgroundColor,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,
@@ -56,7 +71,7 @@ class HomePage extends StatelessWidget {
                   fontFamily: 'Roboto',
                 ),
               ),
-              child: const Text('hi!'),
+              child: const Text('change color'),
             ),
           ],
         ),
