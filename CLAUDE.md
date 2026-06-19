@@ -193,6 +193,9 @@ word while *discussing* this workflow is not an approval):
    async/ticker — the "test doesn't finish until the work finishes" rule)?
 5. The **single highest-leverage change** to make it shorter next time.
 
+Close the retrospective with a **terse verdict** either way: either a concrete
+speed-up recommendation, or an explicit "no changes recommended — already optimal."
+
 ## Flutter prerequisite (Claude Code on the web)
 
 Cloud sessions do **not** ship Flutter. Install it **once** via the environment's
