@@ -49,3 +49,7 @@ macos/Flutter/ephemeral/
 
 # Coverage
 coverage/
+
+# Python
+__pycache__/
+*.pyc

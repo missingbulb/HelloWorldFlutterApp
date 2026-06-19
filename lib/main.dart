@@ -21,20 +21,41 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // The screen starts blue. Pressing the button toggles blue <-> red and, once
+  // pressed, the label names the new colour ("hello world red" / "hello world
+  // blue") so each state is distinguishable.
+  Color _backgroundColor = Colors.blue;
+  String _label = 'hello world';
+
+  void _toggleColor() {
+    setState(() {
+      _backgroundColor =
+          _backgroundColor == Colors.blue ? Colors.red : Colors.blue;
+      final String colorName =
+          _backgroundColor == Colors.blue ? 'blue' : 'red';
+      _label = 'hello world $colorName';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      backgroundColor: _backgroundColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'hello world',
-              style: TextStyle(
+            Text(
+              _label,
+              style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -42,10 +63,10 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: _toggleColor,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
-                foregroundColor: Colors.blue,
+                foregroundColor: _backgroundColor,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,
@@ -56,7 +77,7 @@ class HomePage extends StatelessWidget {
                   fontFamily: 'Roboto',
                 ),
               ),
-              child: const Text('hi!'),
+              child: const Text('change color'),
             ),
           ],
         ),
