@@ -19,15 +19,12 @@ python3 generate_screenshots.py  # images only (same single-process rules)
 (skipping the ~600s teardown stall). Prefer it for "run everything" — generating
 the goldens alongside the tests costs only ~2–3s over the tests alone.
 
-**When the build can be skipped (allowlist, fail-safe).** A run costs ~12s
-wall-clock (~9s VM boot + Dart compile, ~3s test/render — measured), so skip it
-only when nothing it exercises changed. Decide with an **allowlist, not a
-denylist**: skip **only if *every* changed file matches a docs allowlist**
-(`*.md`, `README*`, `LICENSE`, `docs/**`); if **any** file falls outside that set
-— including new or unknown types — **build**. The default is to build: a wasted
-~12s build is cheap, an untested merge is not. (Inverting this to "build only if
-`lib/`/`test/`/`tool/`/`pubspec.*` changed, else skip" is fail-open — any path you
-forget to list ships untested.)
+**When the build can be skipped (allowlist, fail-safe).** Skip the build **only
+if *every* changed file matches a docs allowlist** (`*.md`, `README*`, `LICENSE`,
+`docs/**`); if **any** file falls outside that set — including new or unknown
+types — **build**. Default to building: a wasted build is cheap, an untested
+change is not. An allowlist fails safe (anything unrecognized is built); a
+denylist of "build-relevant" paths fails open (anything unlisted ships untested).
 
 Both write every golden in one run:
 
