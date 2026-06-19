@@ -1,7 +1,8 @@
 # HelloWorldFlutterApp
 
 A Flutter app with a colored background, "hello world" text, and a "change color"
-button that toggles the background between blue and red.
+button that toggles the background between blue and red. Once pressed, the label
+names the current colour ("hello world red" / "hello world blue").
 Screenshot generation is driven by Flutter's rendering engine — no hand-drawing.
 
 ## Generating the screenshots

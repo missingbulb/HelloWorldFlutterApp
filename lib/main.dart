@@ -29,13 +29,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // The screen starts blue. Pressing the button toggles blue <-> red.
+  // The screen starts blue. Pressing the button toggles blue <-> red and, once
+  // pressed, the label names the new colour ("hello world red" / "hello world
+  // blue") so each state is distinguishable.
   Color _backgroundColor = Colors.blue;
+  String _label = 'hello world';
 
   void _toggleColor() {
     setState(() {
       _backgroundColor =
           _backgroundColor == Colors.blue ? Colors.red : Colors.blue;
+      final String colorName =
+          _backgroundColor == Colors.blue ? 'blue' : 'red';
+      _label = 'hello world $colorName';
     });
   }
 
@@ -47,9 +53,9 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'hello world',
-              style: TextStyle(
+            Text(
+              _label,
+              style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,

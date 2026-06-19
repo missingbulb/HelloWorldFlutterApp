@@ -37,8 +37,8 @@ void main() {
     await tester.tap(find.text('change color'));
     await tester.pumpAndSettle();
 
-    // The screen should now be red, with the text and button unchanged.
-    expect(find.text('hello world'), findsOneWidget);
+    // The screen should now be red and the label should name the new colour.
+    expect(find.text('hello world red'), findsOneWidget);
     expect(find.text('change color'), findsOneWidget);
 
     scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
@@ -71,8 +71,8 @@ void main() {
     await tester.tap(find.text('change color'));
     await tester.pumpAndSettle();
 
-    // The screen should be blue again, with the text and button unchanged.
-    expect(find.text('hello world'), findsOneWidget);
+    // The screen should be blue again and the label should name the new colour.
+    expect(find.text('hello world blue'), findsOneWidget);
     expect(find.text('change color'), findsOneWidget);
 
     scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
