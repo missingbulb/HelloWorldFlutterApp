@@ -196,31 +196,28 @@ When the user says **"LGTM"** (a UserPromptSubmit hook,
 ## Flutter prerequisite (Claude Code on the web)
 
 Cloud sessions do **not** ship Flutter. Install it **once** via the environment's
-**setup script** (web UI → environment settings → *Setup script*), not a per-session
-download: the setup script runs the first time a session starts in an environment,
-then Anthropic **snapshots the filesystem and reuses that snapshot**, so later
-sessions already have the SDK on disk (the script step is skipped). This is the
-"download once, cache in the image" path — far better than re-fetching each session.
+**setup script**, not a per-session download: the setup script runs the first time
+a session starts in an environment, then Anthropic **snapshots the filesystem and
+reuses that snapshot**, so later sessions already have the SDK on disk (the script
+step is skipped). This is the "download once, cache in the image" path.
 
-Suggested setup-script snippet (keep total runtime under ~5 min so the cache can
-build; the download is ~1–2 min):
+The setup script is **versioned in this repo** at `.claude/environment-setup.sh`
+(installs the **latest stable** Flutter, matching CI's `subosito/flutter-action`).
+Because the setup script is attached to the cloud environment (not the repo), it
+still has to be pasted into the web UI — but keeping the canonical copy in the repo
+means changes are tracked and new environments are reproducible.
 
-```bash
-# Install Flutter (stable) once; cached into the environment snapshot.
-if [ ! -x /opt/flutter/bin/flutter ]; then
-  curl -fsSL -o /tmp/flutter.tar.xz \
-    https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.24.5-stable.tar.xz
-  tar xf /tmp/flutter.tar.xz -C /opt && rm -f /tmp/flutter.tar.xz
-fi
-ln -sf /opt/flutter/bin/flutter /usr/local/bin/flutter
-ln -sf /opt/flutter/bin/dart /usr/local/bin/dart
-git config --global --add safe.directory /opt/flutter || true
-flutter --version || true
-flutter precache --universal || true   # warm artifacts so the first test is fast
-```
+**To set it up:** copy the full contents of `.claude/environment-setup.sh` into
+the environment's *Setup script* field (web UI → environment selector → edit
+environment → Setup script), then start a fresh session so the snapshot rebuilds.
 
-The setup script is attached to the **cloud environment** (not the repo), so it
-must be set in the web UI — ask the user to paste it. A repo-committed SessionStart
-hook (`.claude/settings.json`) is an alternative that also works locally, but it
-re-runs every session instead of being snapshot-cached, so the setup script is
-preferred for a large SDK download.
+**Version flag + validation.** The setup script writes its `ENV_SETUP_VERSION` to
+`/opt/claude-env/setup-version`. A SessionStart hook
+(`.claude/hooks/check-environment.sh`, registered in `.claude/settings.json`)
+runs every cloud session and compares that flag to the version in the repo's
+setup script. If Flutter is missing, the flag is absent, or it is stale, the hook
+injects context telling Claude to **alert the user** to (re-)paste
+`.claude/environment-setup.sh` into the web UI and restart. Bump
+`ENV_SETUP_VERSION` whenever you change the setup script so existing environments
+are flagged as stale until re-applied. (The hook is gated on `CLAUDE_CODE_REMOTE`,
+so it stays silent in local sessions where the developer installs Flutter directly.)
