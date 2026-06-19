@@ -51,4 +51,38 @@ void main() {
       Colors.red,
     );
   });
+
+  testWidgets('App returns to blue after the change color button is pressed twice',
+      (WidgetTester tester) async {
+    await loadFonts();
+    await tester.pumpWidget(const MyApp());
+
+    // Sanity check: starts blue.
+    Scaffold scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.blue);
+
+    // Press once -> red.
+    await tester.tap(find.text('change color'));
+    await tester.pumpAndSettle();
+    scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.red);
+
+    // Press again -> back to blue.
+    await tester.tap(find.text('change color'));
+    await tester.pumpAndSettle();
+
+    // The screen should be blue again, with the text and button unchanged.
+    expect(find.text('hello world'), findsOneWidget);
+    expect(find.text('change color'), findsOneWidget);
+
+    scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.backgroundColor, Colors.blue);
+
+    // The button foreground colour follows the background colour.
+    final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+    expect(
+      button.style?.foregroundColor?.resolve(<MaterialState>{}),
+      Colors.blue,
+    );
+  });
 }
