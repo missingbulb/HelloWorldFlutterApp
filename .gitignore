@@ -53,3 +53,7 @@ coverage/
 # Python
 __pycache__/
 *.pyc
+
+# Claudinite shared corpus (synced at session start)
+.claudinite/
+.claudinite.new/
