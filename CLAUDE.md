@@ -232,4 +232,4 @@ injects context telling Claude to **alert the user** to (re-)paste
 are flagged as stale until re-applied. (The hook is gated on `CLAUDE_CODE_REMOTE`,
 so it stays silent in local sessions where the developer installs Flutter directly.)
 
-@.claudinite/README.md
+@.claudinite/CLAUDE.md

@@ -14,5 +14,5 @@ if curl -fsSL --retry 2 --max-time 30 "$URL" -o "$tmp/c.tgz" 2>/dev/null \
   rm -rf "$dest"; mv "$dest.new" "$dest"; exit 0
 fi
 [ -f "$dest/README.md" ] && exit 0   # offline: keep prior copy
-echo "Claudinite sync failed, no local copy; @.claudinite/README.md unresolved." >&2
+echo "Claudinite sync failed, no local copy; @.claudinite/CLAUDE.md unresolved." >&2
 exit 0
