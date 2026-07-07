@@ -54,6 +54,7 @@ coverage/
 __pycache__/
 *.pyc
 
-# Claudinite shared corpus (synced at session start)
-.claudinite/
-.claudinite.new/
+# Claudinite shared corpus (synced at session start); keep only the marker tracked
+/.claudinite/*
+!/.claudinite/.gitkeep
+/.claudinite.new/

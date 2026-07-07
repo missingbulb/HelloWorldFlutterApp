@@ -1,0 +1,8 @@
+{
+  "packs": [
+    "flutter",
+    "github-actions"
+  ],
+  "rules": {},
+  "accept": []
+}

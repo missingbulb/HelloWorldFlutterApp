@@ -11,6 +11,7 @@ if curl -fsSL --retry 2 --max-time 30 "$URL" -o "$tmp/c.tgz" 2>/dev/null \
    && tar -tzf "$tmp/c.tgz" >/dev/null 2>&1; then
   rm -rf "$dest.new"; mkdir -p "$dest.new"
   tar -xzf "$tmp/c.tgz" -C "$dest.new" --strip-components=1
+  [ -f "$dest/.gitkeep" ] && cp "$dest/.gitkeep" "$dest.new/.gitkeep"  # keep the committed signal marker
   rm -rf "$dest"; mv "$dest.new" "$dest"; exit 0
 fi
 [ -f "$dest/README.md" ] && exit 0   # offline: keep prior copy
