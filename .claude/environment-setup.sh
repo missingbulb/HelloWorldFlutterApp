@@ -1,32 +1,26 @@
-#!/bin/bash
-# Claude Code on the web — environment setup script (versioned source of truth).
-#
-# WHAT: installs the prerequisites a cloud session needs but the image doesn't
-# ship (Flutter), and records a version flag the SessionStart hook validates.
-#
-# HOW TO USE: copy the FULL contents of this file into the environment's
-# "Setup script" field (web UI -> environment selector -> edit environment ->
-# Setup script). It runs once when an environment is first used; Anthropic then
-# snapshots the filesystem, so later sessions already have Flutter on disk.
-#
-# VERSIONING: bump ENV_SETUP_VERSION whenever this script changes. The
-# SessionStart hook (.claude/hooks/check-environment.sh) compares the version
-# recorded on disk against this number and alerts if the environment is unset or
-# stale, prompting the user to re-paste this script and restart their session.
+#!/usr/bin/env bash
+# GENERIC Claudinite cloud environment setup — identical across projects.
+# Paste the FULL body into the Claude Code Web environment's "Setup script"
+# field (environment settings). Runs once when the environment is created; the
+# filesystem is snapshotted and reused, so installs aren't repaid per session.
+# Per-toolchain install logic + versions live in Claudinite packs (packs/env.mjs,
+# driven by this repo's .claudinite-checks.json), NOT here.
 set -euo pipefail
 
-ENV_SETUP_VERSION=1
+# The Setup script runs as root starting in the checkout's PARENT dir. cd into
+# the checkout — the one dir under here that mounts Claudinite.
+root="$(dirname "$(find "$PWD" -maxdepth 2 -name .claudinite-checks.json 2>/dev/null | head -n1)")"
+cd "$root"
 
-# --- Flutter (latest stable channel; matches CI's subosito/flutter-action) ----
-if [ ! -x /opt/flutter/bin/flutter ]; then
-  git clone --depth 1 -b stable https://github.com/flutter/flutter.git /opt/flutter
-fi
-ln -sf /opt/flutter/bin/flutter /usr/local/bin/flutter
-ln -sf /opt/flutter/bin/dart /usr/local/bin/dart
-git config --global --add safe.directory /opt/flutter || true
-flutter --version || true
-flutter precache || true   # warm host engine artifacts so the first test is fast
+# 1. Prime the Claudinite corpus so the pack env declarations + env.mjs exist
+#    before the first session (the SessionStart sync keeps it current after).
+bash .claude/hooks/sync-claudinite.sh || true
 
-# --- Record the environment version so the SessionStart hook can validate it ---
-mkdir -p /opt/claude-env
-echo "$ENV_SETUP_VERSION" > /opt/claude-env/setup-version
+# 2. Generated-file merge hygiene — universal, cheap, harmless where unused: the
+#    `ours` driver .gitattributes maps GENERATED files to, plus conflict-replay.
+git config merge.ours.driver true
+git config rerere.enabled true
+
+# 3. Install every active pack's declared environment requirement (Flutter SDK,
+#    node deps, …) and stamp the version flag the SessionStart check validates.
+node .claudinite/packs/env.mjs install
