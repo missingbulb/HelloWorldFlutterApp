@@ -95,19 +95,6 @@ loud.
    the fake-async test clock never pumps — awaiting them outside `runAsync()`
    deadlocks.
 
-### Capturing an interactive frame — two more gotchas
-
-- **Don't `pumpAndSettle()` after tapping the button.** The ink ripple keeps
-  scheduling frames, so `pumpAndSettle()` never returns. Use fixed-duration pumps
-  instead: `await tester.pump(const Duration(seconds: 1))` settles the ripple and
-  the colour animation deterministically. (Plain widget tests that only *assert*
-  may still use `pumpAndSettle()` — the hang only bites when you then `toImage()`.)
-- **Pump twice after a tap, or the label colour lags one frame.** The button
-  animates its foreground colour (~200ms). A single pump paints the very first
-  frame *before* the implicit animation advances, so the label shows the *old*
-  colour. Do `await tester.pump();` (apply setState + start the animation) then
-  `await tester.pump(const Duration(seconds: 1));` (let it finish) before capturing.
-
 ## The 600s teardown stall — and the fix
 
 **Symptom:** `flutter test` takes ~10 minutes even though the render finishes in
