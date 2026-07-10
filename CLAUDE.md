@@ -211,25 +211,27 @@ a session starts in an environment, then Anthropic **snapshots the filesystem an
 reuses that snapshot**, so later sessions already have the SDK on disk (the script
 step is skipped). This is the "download once, cache in the image" path.
 
-The setup script is **versioned in this repo** at `.claude/environment-setup.sh`
-(installs the **latest stable** Flutter, matching CI's `subosito/flutter-action`).
-Because the setup script is attached to the cloud environment (not the repo), it
-still has to be pasted into the web UI — but keeping the canonical copy in the repo
-means changes are tracked and new environments are reproducible.
+**The setup script and the Flutter install are corpus-owned — this repo keeps no
+copy of either** (PR #14, adopting Claudinite's pack-driven env model). The generic
+setup script lives in the synced corpus at `.claudinite/environment-setup.sh`; it
+syncs the corpus, sets git hygiene, and runs `node .claudinite/packs/env.mjs
+install`, and the **`flutter` pack** (declared in this repo) is what carries the
+SDK install + pinned version. So there is **no** project-local
+`.claude/environment-setup.sh` and **no** `.claude/hooks/check-environment.sh` /
+`ENV_SETUP_VERSION` flag any more — don't recreate them; change the install by
+editing the flutter pack upstream, not by adding a bespoke installer here.
 
-**To set it up:** copy the full contents of `.claude/environment-setup.sh` into
-the environment's *Setup script* field (web UI → environment selector → edit
-environment → Setup script), then start a fresh session so the snapshot rebuilds.
+**To set it up:** copy the full contents of the corpus
+`.claudinite/environment-setup.sh` into the environment's *Setup script* field
+(web UI → environment selector → edit environment → Setup script), then start a
+fresh session so the snapshot rebuilds. (On a fresh clone that field is populated
+after the first session's `sync-claudinite.sh` hook lands the corpus copy.)
 
-**Version flag + validation.** The setup script writes its `ENV_SETUP_VERSION` to
-`/opt/claude-env/setup-version`. A SessionStart hook
-(`.claude/hooks/check-environment.sh`, registered in `.claude/settings.json`)
-runs every cloud session and compares that flag to the version in the repo's
-setup script. If Flutter is missing, the flag is absent, or it is stale, the hook
-injects context telling Claude to **alert the user** to (re-)paste
-`.claude/environment-setup.sh` into the web UI and restart. Bump
-`ENV_SETUP_VERSION` whenever you change the setup script so existing environments
-are flagged as stale until re-applied. (The hook is gated on `CLAUDE_CODE_REMOTE`,
-so it stays silent in local sessions where the developer installs Flutter directly.)
+**Validation.** The SessionStart hook `node .claudinite/packs/env.mjs check` (wired
+in `.claude/settings.json`) asserts Flutter is present each cloud session and, if
+not, injects context telling Claude to alert the user to (re-)paste the corpus
+setup script and restart. It is **ordered after `sync-claudinite.sh`** on purpose:
+`env.mjs` lives under the synced `.claudinite/`, so the corpus must be populated
+before it can run.
 
 @.claudinite/CLAUDE.md
