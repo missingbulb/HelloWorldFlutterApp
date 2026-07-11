@@ -56,5 +56,5 @@ __pycache__/
 
 # Claudinite shared corpus (synced at session start); keep only the marker tracked
 /.claudinite/*
-!/.claudinite/.gitkeep
+!/.claudinite/sync-claudinite.sh
 /.claudinite.new/
