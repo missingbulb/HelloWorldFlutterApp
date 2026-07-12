@@ -1,8 +1,12 @@
 {
   "packs": [
+    "basics",
     "flutter",
     "github-actions"
   ],
   "rules": {},
-  "accept": []
+  "accept": [],
+  "maintenance": {
+    "delivery": "push"
+  }
 }
