@@ -2,7 +2,9 @@
   "packs": [
     "basics",
     "flutter",
-    "github-actions"
+    "github-actions",
+    "grow_with_claudinite",
+    "tidy-repo"
   ],
   "rules": {},
   "accept": [],
