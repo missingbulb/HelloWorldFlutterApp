@@ -120,21 +120,20 @@ If the stall reappears, diagnose with:
 
 ## Font rendering in golden tests
 
-Flutter's test renderer uses a stub font ("Ahem") with no glyphs by default. Text
-renders as blank colored rectangles unless real fonts are explicitly loaded.
-
-**Fix applied in this repo:**
+The general lesson now lives in the canon `flutter` pack ("Load real fonts before
+any golden", `packs/flutter/RULES.md`): the test binding defaults to the
+glyph-less Ahem stub (text renders as boxes), so real fonts must be
+`FontLoader`-loaded before any widget is pumped, and `ButtonStyle`/`styleFrom`
+text styles don't inherit the theme's `fontFamily` — pin it there explicitly.
+This repo's concrete wiring of that rule:
 
 1. Roboto font files are bundled in `fonts/` and declared in `pubspec.yaml`.
 2. The test harness loads them via `FontLoader` before pumping any widgets.
 3. `ThemeData` has `fontFamily: 'Roboto'` to cover most widgets.
-4. `ElevatedButton.styleFrom`'s `textStyle` needs `fontFamily: 'Roboto'` set
-   **explicitly** — the button merges its text style without inheriting `fontFamily`
-   from the theme, so it falls back to Ahem if not pinned directly.
-
-**General rule:** if a widget's text style comes from `ButtonStyle`, `TextStyle`
-passed directly to a widget, or any `styleFrom` helper, always set
-`fontFamily: 'Roboto'` on it explicitly in addition to the theme-level setting.
+4. `ElevatedButton.styleFrom`'s `textStyle` pins `fontFamily: 'Roboto'`
+   **explicitly** (the `styleFrom` leak the canon warns about) — without it the
+   button label falls back to Ahem and renders as a blank rectangle in goldens
+   while looking correct in production.
 
 ## Changing the app color
 
