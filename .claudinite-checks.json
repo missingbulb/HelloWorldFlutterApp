@@ -1,6 +1,12 @@
 {
   "packs": [
     "basics",
+    {
+      "id": "barriers",
+      "via": [
+        "basics"
+      ]
+    },
     "flutter",
     "github-actions",
     "grow_with_claudinite",
