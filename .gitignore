@@ -55,11 +55,5 @@ __pycache__/
 *.pyc
 
 # Claudinite shared corpus (synced at session start); keep only the marker tracked
-/.claudinite/*
-!/.claudinite/mount/
-/.claudinite/mount/*
-!/.claudinite/mount/sync-claudinite.sh
-!/.claudinite/local_packs/
-/.claudinite.new/
 /.claudinite-hooks.log
 /.claudinite-hooks.log.tmp

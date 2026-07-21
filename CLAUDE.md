@@ -199,27 +199,23 @@ step is skipped). This is the "download once, cache in the image" path.
 
 **The setup script and the Flutter install are corpus-owned — this repo keeps no
 copy of either** (PR #14, adopting Claudinite's pack-driven env model). The generic
-setup script lives in the synced corpus at `.claudinite/environment-setup.sh`; it
-syncs the corpus, sets git hygiene, and runs `node .claudinite/packs/env.mjs
+setup script is the vendored corpus's
+`.claudinite/shared/engine/hooks/environment-setup-command.sh`; it sets git
+hygiene and runs `node .claudinite/shared/engine/pack_loader/env-requirements.mjs
 install`, and the **`flutter` pack** (declared in this repo) is what carries the
 SDK install + pinned version. So there is **no** project-local
 `.claude/environment-setup.sh` and **no** `.claude/hooks/check-environment.sh` /
 `ENV_SETUP_VERSION` flag any more — don't recreate them; change the install by
 editing the flutter pack upstream, not by adding a bespoke installer here.
 
-**To set it up:** copy the full contents of the corpus
-`.claudinite/environment-setup.sh` into the environment's *Setup script* field
-(web UI → environment selector → edit environment → Setup script), then start a
-fresh session so the snapshot rebuilds. (On a fresh clone that field is populated
-after the first session's `sync-claudinite.sh` hook lands the corpus copy.)
+**To set it up:** copy the full contents of
+`.claudinite/shared/engine/hooks/environment-setup-command.sh` into the
+environment's *Setup script* field (web UI → environment selector → edit
+environment → Setup script), then start a fresh session so the snapshot rebuilds.
 
-**Validation.** The SessionStart hook `node .claudinite/packs/env.mjs check` (wired
-in `.claude/settings.json`) asserts Flutter is present each cloud session and, if
-not, injects context telling Claude to alert the user to (re-)paste the corpus
-setup script and restart. It is **ordered after `sync-claudinite.sh`** on purpose:
-`env.mjs` lives under the synced `.claudinite/`, so the corpus must be populated
-before it can run.
-
-@.claudinite/CLAUDE.md
-
-> Claudinite self-check: if the `@.claudinite/CLAUDE.md` import above did not resolve (the `.claudinite/` payload is absent — e.g. no `.claudinite/README.md`), the Claudinite harness is **not active** this session. Treat it as not loaded and confirm with the user before substantive work, since a launch-layer hook failure can eat the sync hook's own not-loaded directive.
+**Validation.** The session-start hook runs
+`node .claudinite/shared/engine/pack_loader/env-requirements.mjs check`, which
+asserts Flutter is present each cloud session and, if not, injects context
+telling Claude to alert the user to (re-)paste the corpus setup script and
+restart. The corpus is tracked (vendored), so the check can always run — no
+sync ordering to worry about.
