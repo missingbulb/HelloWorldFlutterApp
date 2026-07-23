@@ -7,6 +7,12 @@
         "basics"
       ]
     },
+    {
+      "id": "git-github",
+      "via": [
+        "basics"
+      ]
+    },
     "flutter",
     "github-actions",
     "grow_with_claudinite",
@@ -16,7 +22,7 @@
     "delivery": "auto-merge"
   },
   "claudinite": {
-    "updated": "2026-07-21T22:51:43.192Z",
-    "ref": "d6bca9351cd0396cf068ea1199c6475993623a5d"
+    "updated": "2026-07-23T00:41:43.000Z",
+    "ref": "80783ebbc1b9d37f85d544864c9c55343c5dddea"
   }
 }
