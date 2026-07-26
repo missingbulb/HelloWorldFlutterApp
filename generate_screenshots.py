@@ -16,11 +16,7 @@ fewest-processes / kill-immediately / fail-fast rules documented in CLAUDE.md.
 Usage:
     python3 generate_screenshots.py
 """
-import os
-import sys
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from flutter_test_runner import run  # noqa: E402
+from flutter_test_runner import run
 
 
 def main() -> int:
