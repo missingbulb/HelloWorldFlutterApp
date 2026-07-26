@@ -199,10 +199,10 @@ step is skipped). This is the "download once, cache in the image" path.
 
 **The setup script and the Flutter install are corpus-owned — this repo keeps no
 copy of either** (PR #14, adopting Claudinite's pack-driven env model). The generic
-setup script is the vendored corpus's
-`.claudinite/shared/engine/hooks/environment-setup-command.sh`; it sets git
-hygiene and runs `node .claudinite/shared/engine/pack_loader/env-requirements.mjs
-install`, and the **`flutter` pack** (declared in this repo) is what carries the
+setup script ships with the vendored corpus's session hooks (exact path under
+**To set it up** below); it sets git hygiene and runs
+`node .claudinite/shared/engine/pack_loader/env-requirements.mjs install`, and the
+**`flutter` pack** (declared in this repo) is what carries the
 SDK install + pinned version. So there is **no** project-local
 `.claude/environment-setup.sh` and **no** `.claude/hooks/check-environment.sh` /
 `ENV_SETUP_VERSION` flag any more — don't recreate them; change the install by
