@@ -18,6 +18,13 @@
     "grow_with_claudinite",
     "tidy-repo"
   ],
+  "accept": [
+    {
+      "rule": "claudinite-isolation",
+      "path": "CLAUDE.md",
+      "reason": "the cloud-session Flutter prerequisite is a manual copy-paste a human performs outside any session: they must open the corpus's engine/hooks/environment-setup-command.sh and paste its full contents into the environment's Setup script field in the web UI. The environment is provisioned before a session exists, so nothing can read the file on the user's behalf and no indirection can stand in for it — naming the exact path IS the instruction, and the step cannot be followed without it"
+    }
+  ],
   "maintenance": {
     "delivery": "auto-merge"
   },
