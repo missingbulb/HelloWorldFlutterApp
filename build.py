@@ -11,11 +11,7 @@ the instant it prints `All tests passed!`, skipping the ~600s teardown stall.
 Usage:
     python3 build.py
 """
-import os
-import sys
-
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from flutter_test_runner import run  # noqa: E402
+from flutter_test_runner import run
 
 
 def main() -> int:
