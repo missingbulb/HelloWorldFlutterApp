@@ -16,7 +16,8 @@
     "flutter",
     "github-actions",
     "grow_with_claudinite",
-    "tidy-repo"
+    "tidy-repo",
+    "local/hello-world-flutter"
   ],
   "accept": [
     {

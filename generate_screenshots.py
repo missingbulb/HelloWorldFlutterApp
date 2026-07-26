@@ -2,12 +2,12 @@
 """Generate ALL UI golden images in a SINGLE Flutter process, then kill it.
 
 Renders lib/main.dart at every UI state through Flutter's engine (no hand-drawing)
-by launching tool/render_states.dart once via `flutter test`, writing:
-
-    test/goldens/initial_screen.png        blue  (legacy name, initial screen)
-    test/goldens/state_initial.png         blue  (before any press)
-    test/goldens/state_after_press_1.png   red   (after one press)
-    test/goldens/state_after_press_2.png   blue  (after two presses)
+by launching tool/render_states.dart once via `flutter test`, writing every PNG in
+test/goldens/. The image set is declared in ONE place — `_expectedImages` in
+tool/render_states.dart, which is also that run's completion guard — so this
+docstring deliberately does not re-list it (it drifted when it did); CLAUDE.md's
+golden table is the human-readable copy, and the
+hello-world-flutter/golden-set-single-source check keeps the two honest.
 
 This is the images-only path. To also run the widget tests in the same process,
 use `python3 build.py`. The shared runner (flutter_test_runner.py) enforces the

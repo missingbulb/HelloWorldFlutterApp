@@ -135,33 +135,12 @@ This repo's concrete wiring of that rule:
    button label falls back to Ahem and renders as a blank rectangle in goldens
    while looking correct in production.
 
-## Changing the app color
+## Changing the app color, and this sandbox's process notes
 
-Places in `lib/main.dart` that must stay in sync:
-- `ColorScheme.fromSeed(seedColor: Colors.X)`
-- the `_cycle` list (the ordered colours) and `_colorNames` (colour → label name)
-- the initial `_backgroundColor` (must be the first entry in `_cycle`)
-- the button's `foregroundColor` (it follows `_backgroundColor`)
-- `_toggleColor()` advances `_backgroundColor` through `_cycle` and sets `_label`
-  to `'hello world <colour>'` after a press
-
-And the assertions in `test/widget_test.dart`:
-- `expect(scaffold.backgroundColor, Colors.X)`
-- the after-press label text, e.g. `find.text('hello world red')`
-
-## Working in this sandbox (process notes)
-
-- **Use the GitHub MCP tools for CI/PR status, not raw `curl`.** The network
-  policy drops unauthenticated calls to `api.github.com`, so a `curl`-based poll
-  silently returns nothing. `mcp__github__pull_request_read` (method
-  `get_check_runs`) is the reliable way to read CI status.
-- **Kill `flutter test` from Python with `start_new_session=True`** (as
-  `flutter_test_runner.py` does), then `os.killpg`. Do **not** background it with
-  bash `setsid cmd &` — that detaches the job and breaks `$!`/`kill -0` tracking,
-  so you can't tell whether it passed or reap it.
-- **Don't commit `pubspec.lock` churn from a local `flutter pub get`.** The local
-  Flutter version differs from CI and resolves slightly different versions; revert
-  the lockfile so the feature diff stays clean.
+Both live in this repo's own pack, `.claudinite/local/packs/hello-world-flutter/`
+(`RULES.md` loads every session), with three checks enforcing the mechanical parts:
+the colour cycle's lockstep in `lib/main.dart`, the golden set's single declaration
+in `tool/render_states.dart`, and one `flutter test` runner.
 
 ## LGTM → verify, merge, then process retrospective
 

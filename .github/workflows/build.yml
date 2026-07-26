@@ -20,3 +20,7 @@ jobs:
       # sandbox (dropped outbound sockets); GitHub runners have normal networking,
       # so `flutter test` completes cleanly here.
       - run: flutter test
+      # The local pack's checks, with their red-first fixtures and a case that runs
+      # them against the real tree — so a colour-cycle or golden-set drift is a red
+      # run here, not only a session-start warning. Node ships on the runner image.
+      - run: node --test .claudinite/local/packs/hello-world-flutter/pack.test.mjs
