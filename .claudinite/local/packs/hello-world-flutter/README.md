@@ -14,6 +14,7 @@ practice stays in the canon `flutter` pack, declared alongside it.
 | Colour cycle in lockstep | check `hello-world-flutter/color-cycle-lockstep` (blocking) |
 | Golden set declared once | check `hello-world-flutter/golden-set-single-source` (blocking; doc drift advisory) |
 | One `flutter test` runner | check `hello-world-flutter/one-flutter-test-runner` (blocking) |
+| Mount paths we name still resolve | check `hello-world-flutter/mount-path-exists` (blocking) |
 | Changing the app colour | prose ([RULES.md](RULES.md)) |
 | Working in this sandbox | prose ([RULES.md](RULES.md)) |
 
@@ -23,7 +24,7 @@ the pack loads with the shared mount absent.
 ## Fixtures
 
 `pack.test.mjs` runs under `node --test` — each check fires on a violating fixture,
-stays quiet on a clean one, and a final case runs all three against the real
+stays quiet on a clean one, and a final case runs every rule against the real
 working tree and asserts zero findings. It is wired into
 `.github/workflows/build.yml`, so a violation lands as a red CI run, not just a
 session-start warning:
