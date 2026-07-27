@@ -1,7 +1,7 @@
 // Red-first fixtures for this pack's checks: every rule must FIRE on a violating
-// input and stay QUIET on a clean one — plus a live case that runs all three
-// against the real working tree, so the checks guard the repo from CI and not
-// only from a session-start sweep.
+// input and stay QUIET on a clean one — plus a live case that runs every rule in
+// the pack against the real working tree, so the checks guard the repo from CI
+// and not only from a session-start sweep.
 //
 //   node --test .claudinite/local/packs/hello-world-flutter/pack.test.mjs
 import test from 'node:test';
@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import pack from './pack.mjs';
 import colorCycleLockstep from './color-cycle-lockstep.mjs';
+import cycleCoverage from './cycle-coverage.mjs';
 import goldenSetSingleSource from './golden-set-single-source.mjs';
 import oneFlutterTestRunner from './one-flutter-test-runner.mjs';
 
@@ -66,6 +67,68 @@ test('color-cycle-lockstep fires when the button stops following the background'
   const found = colorCycleLockstep.run(ctx({ 'lib/main.dart': app }));
   assert.equal(found.length, 1);
   assert.match(found[0].what, /pinned to Colors\.blue/);
+});
+
+// A widget test file that covers a 3-colour cycle: one press-test per entry,
+// each naming its label and asserting its background colour.
+const cleanTest = `
+  expect(find.text('hello world'), findsOneWidget);
+  expect(scaffold.backgroundColor, Colors.blue);
+  expect(find.text('hello world red'), findsOneWidget);
+  expect(scaffold.backgroundColor, Colors.red);
+  expect(find.text('hello world purple'), findsOneWidget);
+  expect(scaffold.backgroundColor, Colors.purple);
+  expect(find.text('hello world blue'), findsOneWidget);
+`;
+const cleanHarness = `const List<String> _expectedImages = <String>[
+  'initial_screen', 'state_initial',
+  'state_after_press_1', 'state_after_press_2', 'state_after_press_3',
+];`;
+const coverageRepo = (app = cleanApp, test = cleanTest, harnessSrc = cleanHarness) =>
+  ctx({ 'lib/main.dart': app, 'test/widget_test.dart': test, 'tool/render_states.dart': harnessSrc });
+
+// A fourth colour: the suite still passes and the goldens still regenerate, so
+// only a static comparison catches that nothing presses that far.
+const fourColourApp = cleanApp
+  .replace('Colors.purple,\n  ];', 'Colors.purple,\n    Colors.green,\n  ];')
+  .replace("'blue', 'red', 'purple'", "'blue', 'red', 'purple', 'green'");
+
+test('cycle-coverage is quiet when every colour has its test and its golden', () => {
+  assert.deepEqual(cycleCoverage.run(coverageRepo()), []);
+});
+
+test('cycle-coverage fires on a colour no widget test presses to', () => {
+  const found = cycleCoverage.run(coverageRepo(fourColourApp, cleanTest, `const List<String> _expectedImages = <String>[
+  'state_after_press_1', 'state_after_press_2', 'state_after_press_3', 'state_after_press_4',
+];`));
+  assert.equal(found.length, 1);
+  assert.equal(found[0].file, 'test/widget_test.dart');
+  assert.match(found[0].what, /press 3 lands on Colors\.green/);
+  assert.match(found[0].what, /'hello world green'.*Colors\.green background/);
+  assert.equal(found[0].rule, 'hello-world-flutter/cycle-coverage');
+  assert.equal(found[0].severity, 'blocking');
+});
+
+test('cycle-coverage fires on a cycle the golden set never renders that far', () => {
+  const testedFour = `${cleanTest}
+  expect(find.text('hello world green'), findsOneWidget);
+  expect(scaffold.backgroundColor, Colors.green);
+`;
+  const found = cycleCoverage.run(coverageRepo(fourColourApp, testedFour));
+  assert.equal(found.length, 1);
+  assert.equal(found[0].file, 'tool/render_states.dart');
+  assert.match(found[0].what, /4 colours long but _expectedImages does not render state_after_press_4/);
+});
+
+test('cycle-coverage leaves a length mismatch to color-cycle-lockstep', () => {
+  // _cycle grew but _colorNames did not: only the aligned prefix is judged, so
+  // the two checks never double-report the same edit.
+  const app = cleanApp.replace('Colors.purple,\n  ];', 'Colors.purple,\n    Colors.green,\n  ];');
+  assert.deepEqual(cycleCoverage.run(coverageRepo(app)), []);
+});
+
+test('cycle-coverage is quiet when the app declares no cycle at all', () => {
+  assert.deepEqual(cycleCoverage.run(ctx({ 'lib/main.dart': 'void main() {}' })), []);
 });
 
 const harness = (names) =>

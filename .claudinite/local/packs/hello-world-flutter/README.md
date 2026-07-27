@@ -12,9 +12,10 @@ practice stays in the canon `flutter` pack, declared alongside it.
 | Rule | How enforced |
 |---|---|
 | Colour cycle in lockstep | check `hello-world-flutter/color-cycle-lockstep` (blocking) |
+| Every colour tested and rendered | check `hello-world-flutter/cycle-coverage` (blocking) |
 | Golden set declared once | check `hello-world-flutter/golden-set-single-source` (blocking; doc drift advisory) |
 | One `flutter test` runner | check `hello-world-flutter/one-flutter-test-runner` (blocking) |
-| Changing the app colour | prose ([RULES.md](RULES.md)) |
+| Regenerating goldens after a colour change | prose ([RULES.md](RULES.md)) — a check sees a *missing* golden, never a *stale* one |
 | Working in this sandbox | prose ([RULES.md](RULES.md)) |
 
 Every rule module imports nothing outside this directory (only `finding.mjs`), so
@@ -23,7 +24,7 @@ the pack loads with the shared mount absent.
 ## Fixtures
 
 `pack.test.mjs` runs under `node --test` — each check fires on a violating fixture,
-stays quiet on a clean one, and a final case runs all three against the real
+stays quiet on a clean one, and a final case runs every rule against the real
 working tree and asserts zero findings. It is wired into
 `.github/workflows/build.yml`, so a violation lands as a red CI run, not just a
 session-start warning:

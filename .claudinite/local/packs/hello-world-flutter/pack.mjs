@@ -1,4 +1,5 @@
 import colorCycleLockstep from './color-cycle-lockstep.mjs';
+import cycleCoverage from './cycle-coverage.mjs';
 import goldenSetSingleSource from './golden-set-single-source.mjs';
 import oneFlutterTestRunner from './one-flutter-test-runner.mjs';
 
@@ -18,5 +19,5 @@ export default {
   detect: null,
   marker: null,
   prose: 'RULES.md',
-  rules: [colorCycleLockstep, goldenSetSingleSource, oneFlutterTestRunner],
+  rules: [colorCycleLockstep, cycleCoverage, goldenSetSingleSource, oneFlutterTestRunner],
 };
