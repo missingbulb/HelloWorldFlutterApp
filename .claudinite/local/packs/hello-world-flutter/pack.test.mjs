@@ -1,5 +1,5 @@
 // Red-first fixtures for this pack's checks: every rule must FIRE on a violating
-// input and stay QUIET on a clean one — plus a live case that runs all three
+// input and stay QUIET on a clean one — plus a live case that runs every rule
 // against the real working tree, so the checks guard the repo from CI and not
 // only from a session-start sweep.
 //
@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import pack from './pack.mjs';
 import colorCycleLockstep from './color-cycle-lockstep.mjs';
 import goldenSetSingleSource from './golden-set-single-source.mjs';
+import mountPathExists from './mount-path-exists.mjs';
 import oneFlutterTestRunner from './one-flutter-test-runner.mjs';
 
 // The check context the engine passes a world-scope rule, reduced to what these
@@ -145,6 +146,53 @@ test('one-flutter-test-runner fires when the runner loses its process group', ()
   }));
   assert.equal(found.length, 2);
   assert.ok(found.every((f) => f.file === 'flutter_test_runner.py'));
+});
+
+// Built rather than spelled: this file is itself scanned by the live-tree case
+// below, so a literal stale mount path in a fixture would make the rule fire on
+// the real repo.
+const MOUNT = '.claudinite';
+const SETUP = `${MOUNT}/shared/engine/hooks/environment-setup-command.sh`;
+const STALE = `${MOUNT}/shared/mount/environment-setup.sh`;
+const PACK_DIR = `${MOUNT}/local/packs/hello-world-flutter`;
+
+const mountRepo = (doc) => ctx({
+  'CLAUDE.md': doc,
+  [SETUP]: '#!/usr/bin/env bash',
+  [`${PACK_DIR}/RULES.md`]: '# rules',
+});
+
+test('mount-path-exists is quiet when every path named still resolves', () => {
+  assert.deepEqual(mountPathExists.run(mountRepo(`paste \`${SETUP}\` into the Setup script field`)), []);
+});
+
+test('mount-path-exists is quiet on a directory reference', () => {
+  assert.deepEqual(mountPathExists.run(mountRepo(`this repo's own pack lives in \`${PACK_DIR}/\`.`)), []);
+});
+
+test('mount-path-exists fires on a path the mount no longer holds', () => {
+  const found = mountPathExists.run(mountRepo(`paste \`${STALE}\` into the Setup script field`));
+  assert.equal(found.length, 1);
+  assert.equal(found[0].file, 'CLAUDE.md');
+  assert.equal(found[0].rule, 'hello-world-flutter/mount-path-exists');
+  assert.match(found[0].what, /shared\/mount\/environment-setup\.sh`, which is not in the mount/);
+  assert.equal(found[0].severity, 'blocking');
+});
+
+test('mount-path-exists leaves the vendored canon to talk about itself', () => {
+  const found = mountPathExists.run(ctx({
+    [SETUP]: '#!/usr/bin/env bash',
+    [`${MOUNT}/shared/engine/hooks/README.md`]: `see ${STALE}`,
+  }));
+  assert.deepEqual(found, []);
+});
+
+test('mount-path-exists stays quiet about shared/ when the mount is not checked out', () => {
+  const found = mountPathExists.run(ctx({
+    'CLAUDE.md': `paste \`${STALE}\``,
+    [`${PACK_DIR}/RULES.md`]: '# rules',
+  }));
+  assert.deepEqual(found, []);
 });
 
 test('every rule is quiet on the real working tree', () => {

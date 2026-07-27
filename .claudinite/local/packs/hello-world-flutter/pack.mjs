@@ -1,5 +1,6 @@
 import colorCycleLockstep from './color-cycle-lockstep.mjs';
 import goldenSetSingleSource from './golden-set-single-source.mjs';
+import mountPathExists from './mount-path-exists.mjs';
 import oneFlutterTestRunner from './one-flutter-test-runner.mjs';
 
 // This repo's own pack: what is true of HelloWorldFlutterApp specifically and of
@@ -18,5 +19,5 @@ export default {
   detect: null,
   marker: null,
   prose: 'RULES.md',
-  rules: [colorCycleLockstep, goldenSetSingleSource, oneFlutterTestRunner],
+  rules: [colorCycleLockstep, goldenSetSingleSource, mountPathExists, oneFlutterTestRunner],
 };
