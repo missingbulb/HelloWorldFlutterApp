@@ -15,6 +15,13 @@ const FOREGROUND = /foregroundColor:\s*([A-Za-z_][\w.]*)/;
 
 const APP = 'lib/main.dart';
 
+// The cycle's label list, parsed once here so every rule that reasons about the
+// cycle reads it the same way (cycle-test-coverage is the other caller).
+export const colorNames = (text) => {
+  const body = NAMES.exec(text);
+  return body ? [...body[1].matchAll(/'([^']*)'/g)].map((m) => m[1]) : [];
+};
+
 const rule = {
   id: 'hello-world-flutter/color-cycle-lockstep',
   severity: 'blocking',

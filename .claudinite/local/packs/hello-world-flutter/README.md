@@ -12,14 +12,16 @@ practice stays in the canon `flutter` pack, declared alongside it.
 | Rule | How enforced |
 |---|---|
 | Colour cycle in lockstep | check `hello-world-flutter/color-cycle-lockstep` (blocking) |
+| Every colour has its press test | check `hello-world-flutter/cycle-test-coverage` (blocking) |
 | Golden set declared once | check `hello-world-flutter/golden-set-single-source` (blocking; doc drift advisory) |
 | One `flutter test` runner | check `hello-world-flutter/one-flutter-test-runner` (blocking) |
 | Mount paths we name still resolve | check `hello-world-flutter/mount-path-exists` (blocking) |
 | Changing the app colour | prose ([RULES.md](RULES.md)) |
 | Working in this sandbox | prose ([RULES.md](RULES.md)) |
 
-Every rule module imports nothing outside this directory (only `finding.mjs`), so
-the pack loads with the shared mount absent.
+Every rule module imports nothing outside this directory (`finding.mjs`, and
+`cycle-test-coverage` reuses `color-cycle-lockstep`'s cycle parser rather than
+re-deriving it), so the pack loads with the shared mount absent.
 
 ## Fixtures
 

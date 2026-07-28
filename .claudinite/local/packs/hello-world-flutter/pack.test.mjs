@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 
 import pack from './pack.mjs';
 import colorCycleLockstep from './color-cycle-lockstep.mjs';
+import cycleTestCoverage from './cycle-test-coverage.mjs';
 import goldenSetSingleSource from './golden-set-single-source.mjs';
 import mountPathExists from './mount-path-exists.mjs';
 import oneFlutterTestRunner from './one-flutter-test-runner.mjs';
@@ -67,6 +68,59 @@ test('color-cycle-lockstep fires when the button stops following the background'
   const found = colorCycleLockstep.run(ctx({ 'lib/main.dart': app }));
   assert.equal(found.length, 1);
   assert.match(found[0].what, /pinned to Colors\.blue/);
+});
+
+// One press test per colour: press i lands on _cycle[i], and the last press
+// wraps back to _cycle[0] — which is why the starting colour needs a test too.
+const pressTest = (name) => `
+  testWidgets('lands on ${name}', (WidgetTester tester) async {
+    expect(find.text('hello world ${name}'), findsOneWidget);
+    expect(scaffold.backgroundColor, Colors.${name});
+  });`;
+const widgetTest = (names) => `void main() {${names.map(pressTest).join('')}\n}`;
+
+test('cycle-test-coverage is quiet when every colour has its press test', () => {
+  const found = cycleTestCoverage.run(ctx({
+    'lib/main.dart': cleanApp,
+    'test/widget_test.dart': widgetTest(['blue', 'red', 'purple']),
+  }));
+  assert.deepEqual(found, []);
+});
+
+test('cycle-test-coverage fires on a colour added without the press that reaches it', () => {
+  const app = cleanApp
+    .replace('Colors.purple,\n  ];', 'Colors.purple,\n    Colors.green,\n  ];')
+    .replace("'blue', 'red', 'purple'", "'blue', 'red', 'purple', 'green'");
+  const found = cycleTestCoverage.run(ctx({
+    'lib/main.dart': app,
+    'test/widget_test.dart': widgetTest(['blue', 'red', 'purple']),
+  }));
+  assert.equal(found.length, 1);
+  assert.equal(found[0].rule, 'hello-world-flutter/cycle-test-coverage');
+  assert.equal(found[0].file, 'test/widget_test.dart');
+  assert.equal(found[0].severity, 'blocking');
+  assert.match(found[0].what, /_cycle\[3\] \(Colors\.green\)/);
+  assert.match(found[0].fix, /taps 'change color' 3 time\(s\)/);
+});
+
+test('cycle-test-coverage fires when a test names the colour but never asserts the background', () => {
+  const found = cycleTestCoverage.run(ctx({
+    'lib/main.dart': cleanApp,
+    'test/widget_test.dart': widgetTest(['blue', 'red', 'purple'])
+      .replace('expect(scaffold.backgroundColor, Colors.purple);', ''),
+  }));
+  assert.equal(found.length, 1);
+  assert.match(found[0].what, /no test asserts the background of _cycle\[2\] \(Colors\.purple\)/);
+});
+
+test('cycle-test-coverage blames the wrapping press for the starting colour', () => {
+  const found = cycleTestCoverage.run(ctx({
+    'lib/main.dart': cleanApp,
+    'test/widget_test.dart': widgetTest(['red', 'purple']),
+  }));
+  assert.equal(found.length, 1);
+  assert.match(found[0].what, /_cycle\[0\] \(Colors\.blue\)/);
+  assert.match(found[0].fix, /taps 'change color' 3 time\(s\)/);
 });
 
 const harness = (names) =>

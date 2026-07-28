@@ -1,4 +1,5 @@
 import colorCycleLockstep from './color-cycle-lockstep.mjs';
+import cycleTestCoverage from './cycle-test-coverage.mjs';
 import goldenSetSingleSource from './golden-set-single-source.mjs';
 import mountPathExists from './mount-path-exists.mjs';
 import oneFlutterTestRunner from './one-flutter-test-runner.mjs';
@@ -19,5 +20,11 @@ export default {
   detect: null,
   marker: null,
   prose: 'RULES.md',
-  rules: [colorCycleLockstep, goldenSetSingleSource, mountPathExists, oneFlutterTestRunner],
+  rules: [
+    colorCycleLockstep,
+    cycleTestCoverage,
+    goldenSetSingleSource,
+    mountPathExists,
+    oneFlutterTestRunner,
+  ],
 };

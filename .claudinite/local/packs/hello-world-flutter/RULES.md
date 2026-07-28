@@ -9,13 +9,12 @@ it. This repo's mechanical invariants are checks, not prose (see
 ## Changing the app colour
 
 The colour cycle is the app's whole behaviour, and changing it is a multi-file
-edit. `lib/main.dart` is checked for internal lockstep (`_cycle` ↔ `_colorNames`
-↔ the `ColorScheme.fromSeed` seed ↔ the button's `foregroundColor`), so the parts
-that remain **yours** to update in the same change are:
+edit. Two of those files are checked: `lib/main.dart` for internal lockstep
+(`_cycle` ↔ `_colorNames` ↔ the `ColorScheme.fromSeed` seed ↔ the button's
+`foregroundColor`), and `test/widget_test.dart` for cycle coverage — the presses
+walk the cycle in order, so a colour no test presses far enough to reach is a
+state the green suite never looked at. What remains **yours** in the same change:
 
-- `test/widget_test.dart` — the per-press assertions: `expect(scaffold.backgroundColor, Colors.X)`
-  and the label the press produces, `find.text('hello world <colour>')`. There is
-  one test per press; a longer cycle needs another one.
 - the goldens — regenerate with `python3 build.py` and commit the PNGs. The label
   names the colour, so every state's image really does change.
 
