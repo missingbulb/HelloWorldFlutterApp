@@ -15,11 +15,17 @@ practice stays in the canon `flutter` pack, declared alongside it.
 | Golden set declared once | check `hello-world-flutter/golden-set-single-source` (blocking; doc drift advisory) |
 | One `flutter test` runner | check `hello-world-flutter/one-flutter-test-runner` (blocking) |
 | Mount paths we name still resolve | check `hello-world-flutter/mount-path-exists` (blocking) |
+| The pack loads with the mount absent | check `hello-world-flutter/pack-local-imports` (blocking) |
 | Changing the app colour | prose ([RULES.md](RULES.md)) |
 | Working in this sandbox | prose ([RULES.md](RULES.md)) |
 
-Every rule module imports nothing outside this directory (only `finding.mjs`), so
-the pack loads with the shared mount absent.
+Why that last one matters, since the check now enforces it: the engine `import()`s
+these modules at session start, when nothing is guaranteed but this directory —
+the shared canon may be unsynced, and with no `package.json` there is no
+`node_modules` either. A module that reaches outside the pack throws, and the
+pack then declares *no* rules at all, so every check above stops guarding this
+repo without a word. That silence is why `finding.mjs` is a local copy of the
+engine's helper rather than an import of it.
 
 ## Fixtures
 

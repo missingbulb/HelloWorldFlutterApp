@@ -16,6 +16,7 @@ import colorCycleLockstep from './color-cycle-lockstep.mjs';
 import goldenSetSingleSource from './golden-set-single-source.mjs';
 import mountPathExists from './mount-path-exists.mjs';
 import oneFlutterTestRunner from './one-flutter-test-runner.mjs';
+import packLocalImports from './pack-local-imports.mjs';
 
 // The check context the engine passes a world-scope rule, reduced to what these
 // rules touch: the tracked file list plus a reader that returns null for absent.
@@ -193,6 +194,67 @@ test('mount-path-exists stays quiet about shared/ when the mount is not checked 
     [`${PACK_DIR}/RULES.md`]: '# rules',
   }));
   assert.deepEqual(found, []);
+});
+
+// Built rather than spelled, for the same reason as the mount fixtures above:
+// this file is scanned by the live-tree case, and a literal `<keyword> '<bad
+// path>'` in a fixture would make pack-local-imports fire on the real repo.
+const FROM = `fr${'om'}`;
+const IMPORT = `imp${'ort'}`;
+const importing = (spec) => `${IMPORT} { finding } ${FROM} '${spec}';\n`;
+const OUTSIDE = `${MOUNT}/shared/engine/checks/helpers/findings.mjs`;
+
+const packRepo = (files) => {
+  const tree = { [`${PACK_DIR}/finding.mjs`]: 'export const finding = () => ({});' };
+  for (const [name, source] of Object.entries(files)) tree[`${PACK_DIR}/${name}`] = source;
+  return ctx(tree);
+};
+
+test('pack-local-imports is quiet on modules that stay inside the pack', () => {
+  const found = packLocalImports.run(packRepo({
+    'a-rule.mjs': importing('./finding.mjs'),
+    'nested/helper.mjs': importing('../finding.mjs'),
+    'pack.test.mjs': `${importing('node:test')}${importing('./a-rule.mjs')}`,
+    'nested/deep.mjs': importing('./helper.mjs'),
+  }));
+  assert.deepEqual(found, []);
+});
+
+test('pack-local-imports fires on an import that reaches out to the shared mount', () => {
+  const found = packLocalImports.run(packRepo({ 'a-rule.mjs': importing(`../../../../${OUTSIDE}`) }));
+  assert.equal(found.length, 1);
+  assert.equal(found[0].file, `${PACK_DIR}/a-rule.mjs`);
+  assert.equal(found[0].rule, 'hello-world-flutter/pack-local-imports');
+  assert.equal(found[0].severity, 'blocking');
+  assert.match(found[0].what, /outside \.claudinite\/local\/packs\/hello-world-flutter/);
+});
+
+test('pack-local-imports fires on a bare package specifier', () => {
+  const found = packLocalImports.run(packRepo({ 'a-rule.mjs': importing('yaml') }));
+  assert.equal(found.length, 1);
+  assert.match(found[0].what, /package specifier resolved through node_modules/);
+});
+
+// The `//` inside the specifier is why the comment stripper has to know where a
+// string starts: cutting at the first `//` would hide exactly this violation.
+test('pack-local-imports fires on a URL specifier despite its slashes', () => {
+  const found = packLocalImports.run(packRepo({ 'a-rule.mjs': importing('https://esm.sh/yaml') }));
+  assert.equal(found.length, 1);
+  assert.match(found[0].what, /esm\.sh\/yaml/);
+});
+
+test('pack-local-imports fires on a relative import the pack does not contain', () => {
+  const found = packLocalImports.run(packRepo({ 'a-rule.mjs': importing('./helpers/shared.mjs') }));
+  assert.equal(found.length, 1);
+  assert.match(found[0].what, /not a tracked file/);
+});
+
+test('pack-local-imports reads code, not the comments that discuss it', () => {
+  const prose = `// why finding.mjs is local: never ${FROM} '${OUTSIDE}'\n`;
+  const block = `/*\n * nor ${FROM} '${OUTSIDE}'\n */\n`;
+  const trailing = `const x = 1; // and not ${FROM} '${OUTSIDE}' either\n`;
+  const source = prose + block + trailing + importing('./finding.mjs');
+  assert.deepEqual(packLocalImports.run(packRepo({ 'a-rule.mjs': source })), []);
 });
 
 test('every rule is quiet on the real working tree', () => {
