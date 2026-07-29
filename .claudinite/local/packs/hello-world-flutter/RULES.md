@@ -21,10 +21,6 @@ that remain **yours** to update in the same change are:
 
 ## Working in this sandbox
 
-- **GitHub MCP tools for CI/PR status, never raw `curl`.** The network policy drops
-  unauthenticated calls to `api.github.com`, so a `curl`-based poll silently returns
-  nothing at all. `mcp__github__pull_request_read` (method `get_check_runs`) reads
-  CI reliably.
 - **A mount path in `CLAUDE.md`: reword it away unless a human must open the file
   by hand.** `claudinite-isolation` fires on each one, and only one earns an
   `accept` — the Setup-script paste target, which a person opens before any
