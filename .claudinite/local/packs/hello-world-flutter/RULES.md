@@ -31,3 +31,11 @@ that remain **yours** to update in the same change are:
 - **Don't commit `pubspec.lock` churn from a local `flutter pub get`.** The local
   Flutter version differs from CI and resolves slightly different versions; revert
   the lockfile so the feature diff stays clean.
+- **Every `python3 build.py` also dirties `test/goldens/` — revert it unless the
+  change is an app change.** The build rewrites all five PNGs, and the local
+  Flutter renders bytes that differ from the committed ones even when `lib/` and
+  `tool/` are untouched, so a docs- or pack-only branch ends up carrying five
+  modified images that have nothing to do with it. Expect it, don't diagnose it:
+  after any build on such a branch, `git checkout -- pubspec.lock test/goldens/`
+  before committing or merging. Committed goldens are regenerated on purpose only
+  when the rendered app really changed (see "Changing the app colour" above).
