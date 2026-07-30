@@ -268,7 +268,7 @@ test('every rule is quiet on the real working tree', () => {
     },
     exists: (path) => tracked.includes(path),
   };
-  for (const rule of pack.rules) {
+  for (const rule of pack.worldRules) {
     assert.deepEqual(
       rule.run(live).map((f) => `${f.file}: ${f.what}`),
       [],
