@@ -28,15 +28,16 @@ that remain **yours** to update in the same change are:
   (naming which script a paragraph is about, when the actionable path is already
   spelled in "To set it up") is reworded away instead, so the accept keeps
   excusing exactly one crossing and its reason describes the whole of it.
-- **A verification-only build dirties the lockfile *and* every golden — revert
-  both.** `python3 build.py` on an otherwise untouched tree comes back with
-  `pubspec.lock` and all five `test/goldens/*.png` modified: the local Flutter
-  differs from CI's, so it resolves slightly different package versions and
-  re-encodes the PNGs (same byte count, different bytes). CLAUDE.md's
-  "regenerate and commit the PNGs" is for when the app's rendering actually
-  changed; on a docs- or pack-only branch that churn is toolchain noise, so
-  `git checkout -- pubspec.lock test/goldens/` before committing and keep the
-  diff to the files the change is about.
+- **A local `flutter pub get` rewrites `pubspec.lock`:** the local Flutter version
+  differs from CI and resolves slightly different versions.
+- **Every `python3 build.py` also dirties `test/goldens/` — revert it unless the
+  change is an app change.** The build rewrites all five PNGs, and the local
+  Flutter renders bytes that differ from the committed ones even when `lib/` and
+  `tool/` are untouched, so a docs- or pack-only branch ends up carrying five
+  modified images that have nothing to do with it. Expect it, don't diagnose it:
+  after any build on such a branch, `git checkout -- pubspec.lock test/goldens/`
+  before committing or merging. Committed goldens are regenerated on purpose only
+  when the rendered app really changed (see "Changing the app colour" above).
 - **Don't land a `.claudinite-checks.json` key the vendored engine doesn't know
   yet.** Settings validation is an allowlist — `CONFIG_KEYS` in the vendored
   checks engine — so a key canon has only just added reads here as a blocking
