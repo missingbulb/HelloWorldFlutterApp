@@ -28,9 +28,8 @@ that remain **yours** to update in the same change are:
   (naming which script a paragraph is about, when the actionable path is already
   spelled in "To set it up") is reworded away instead, so the accept keeps
   excusing exactly one crossing and its reason describes the whole of it.
-- **Don't commit `pubspec.lock` churn from a local `flutter pub get`.** The local
-  Flutter version differs from CI and resolves slightly different versions; revert
-  the lockfile so the feature diff stays clean.
+- **A local `flutter pub get` rewrites `pubspec.lock`:** the local Flutter version
+  differs from CI and resolves slightly different versions.
 - **Every `python3 build.py` also dirties `test/goldens/` — revert it unless the
   change is an app change.** The build rewrites all five PNGs, and the local
   Flutter renders bytes that differ from the committed ones even when `lib/` and
