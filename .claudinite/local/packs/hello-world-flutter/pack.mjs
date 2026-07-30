@@ -17,10 +17,14 @@ import packLocalImports from './pack-local-imports.mjs';
 // the shared mount absent is itself a check now — `pack-local-imports`.
 export default {
   id: 'hello-world-flutter',
+  ruleRoutingGuidance: {
+    belongs: "this app's hand-kept invariants — colour-cycle lockstep, its golden set, the one-runner discipline",
+    excludes: 'portable Flutter practice — real fonts, live tickers, the stall-robust runner — that is flutter',
+  },
   detect: null,
   marker: null,
   prose: 'RULES.md',
-  rules: [
+  worldRules: [
     colorCycleLockstep,
     goldenSetSingleSource,
     mountPathExists,
