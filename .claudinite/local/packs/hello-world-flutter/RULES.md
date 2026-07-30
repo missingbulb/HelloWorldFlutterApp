@@ -28,6 +28,20 @@ that remain **yours** to update in the same change are:
   (naming which script a paragraph is about, when the actionable path is already
   spelled in "To set it up") is reworded away instead, so the accept keeps
   excusing exactly one crossing and its reason describes the whole of it.
-- **Don't commit `pubspec.lock` churn from a local `flutter pub get`.** The local
-  Flutter version differs from CI and resolves slightly different versions; revert
-  the lockfile so the feature diff stays clean.
+- **A verification-only build dirties the lockfile *and* every golden — revert
+  both.** `python3 build.py` on an otherwise untouched tree comes back with
+  `pubspec.lock` and all five `test/goldens/*.png` modified: the local Flutter
+  differs from CI's, so it resolves slightly different package versions and
+  re-encodes the PNGs (same byte count, different bytes). CLAUDE.md's
+  "regenerate and commit the PNGs" is for when the app's rendering actually
+  changed; on a docs- or pack-only branch that churn is toolchain noise, so
+  `git checkout -- pubspec.lock test/goldens/` before committing and keep the
+  diff to the files the change is about.
+- **Don't land a `.claudinite-checks.json` key the vendored engine doesn't know
+  yet.** Settings validation is an allowlist — `CONFIG_KEYS` in the vendored
+  checks engine — so a key canon has only just added reads here as a blocking
+  `unknown setting "…"` on every session, until baselining re-vendors the mount.
+  Grep `CONFIG_KEYS` in the vendored engine first, and land the key only once
+  the mount carries it. Dormancy sharpens this: `"dormant": true` stops every
+  scheduled task, baselining included, so the mount falls behind by design and
+  the gap will not close by waiting.
