@@ -6,6 +6,30 @@ Portable Flutter practice lives in the canon `flutter` pack — nothing here rep
 it. This repo's mechanical invariants are checks, not prose (see
 [README.md](README.md)); what follows is the judgment that no regex can carry.
 
+## Rules capture work procedure, never product requirements
+
+A rule — prose here, or a check in this pack — describes **how we work on this
+repo**: the order of a multi-file edit, which process artifacts must stay in step,
+what this sandbox forces on `flutter test`. It must never encode **what the app
+does**: the colour cycle's membership, the greeting's wording, a screen's layout.
+Those are the product, and the product is specified in the repo's `CLAUDE.md` and
+enforced by `test/widget_test.dart` and the goldens — the artifacts a product
+change is *supposed* to rewrite.
+
+The distinction is what happens on a legitimate product change. Rename the label
+from "hello world red" to "hi there red" and the widget test fails — correctly; it
+is the spec, and you update it in the same edit. A check that had *also*
+hard-coded `'hello world <colour>'` fails too, but says nothing true: no procedure
+was violated, so the finding is noise, and clearing it means editing the rule
+engine to match the app. That is the tell — **if a rule would have to change every
+time the product changes, it was never a rule.** It also pays twice, since the
+widget test already caught anything real.
+
+A drift guard is still procedure and still belongs: `color-cycle-lockstep` does
+not say the cycle is blue → red → purple, it says that *whatever* the cycle is,
+the parallel lists and the theme seed must agree — one fact kept in one place,
+which survives any product change.
+
 ## Changing the app colour
 
 The colour cycle is the app's whole behaviour, and changing it is a multi-file

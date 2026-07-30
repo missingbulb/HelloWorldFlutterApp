@@ -16,6 +16,7 @@ practice stays in the canon `flutter` pack, declared alongside it.
 | One `flutter test` runner | check `hello-world-flutter/one-flutter-test-runner` (blocking) |
 | Mount paths we name still resolve | check `hello-world-flutter/mount-path-exists` (blocking) |
 | The pack loads with the mount absent | check `hello-world-flutter/pack-local-imports` (blocking) |
+| Rules are work procedure, never product requirements | prose ([RULES.md](RULES.md)) |
 | Changing the app colour | prose ([RULES.md](RULES.md)) |
 | Working in this sandbox | prose ([RULES.md](RULES.md)) |
 
